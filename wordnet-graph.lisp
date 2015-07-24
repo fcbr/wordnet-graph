@@ -3,9 +3,9 @@
 (in-package #:wordnet-graph)
 
 (defparameter test-data
-    '("15124361-n" "02604760-v" "01158872-v" "00056930-v" "00024073-r" "14974264-n" "06468951-n"
-;; "00047534-r" "11410625-n" "05660268-n" "08462320-n" "14845743-n" "00014285-r"
- "14877585-n" "05996646-n" "01210854-a" "11495041-n" "04007894-n" "14966667-n"))
+  '("15124361-n" "02604760-v" "01158872-v" "00056930-v" "00024073-r"
+    "14974264-n" "06468951-n" "14877585-n" "05996646-n" "01210854-a"
+    "11495041-n" "04007894-n" "14966667-n"))
 
 (defparameter *relations* (make-hash-table :test #'equal))
 (defparameter *properties* '("wn30_instanceOf" "wn30_hasInstance" "wn30_hyponymOf" "wn30_hypernymOf" "word_en"))
@@ -56,18 +56,6 @@
 
 ;; transitive-reduction
 
-(defun transitive-closure (synsets)
-  (let ((closure synsets)
-	(tmp nil))
-    (loop 
-       (setf tmp (remove-duplicates 
-		  (append closure (mapcan #'relation-up closure)) 
-		  :test #'equal))
-       (when (= (length tmp) (length closure))
-	 (return))
-       (setf closure tmp))
-    (remove-duplicates closure :test #'equal)))
-
 (defun roots (synsets)
   (remove-if-not (lambda (s) 
 		   (zerop (funcall *out-degree-fn* s))) 
@@ -86,5 +74,5 @@
        nil)))))
 
 (defun create-hierarchy (synsets)
-  (let* ((s* (transitive-closure synsets)))
+  (let* ((s* (transitive-closure synsets #'relation-up)))
     (mapcar (lambda (n) (get-subtree-node n s*)) (roots s*))))
