@@ -2,12 +2,16 @@
 
 (in-package #:wordnet-graph)
 
+(defparameter *basedir*
+  (make-pathname :directory
+		 (pathname-directory
+		  (asdf:component-pathname (asdf:find-system '#:wordnet-graph)))))
+
 (defparameter test-data
   '("15126931-n" "15124361-n"
     "02604760-v" "01158872-v" "00056930-v" "00024073-r"
     "14974264-n" "06468951-n" "14877585-n" "05996646-n" "01210854-a"
     "11495041-n" "04007894-n" "14966667-n"))
-
 
 (defparameter *word-en* (make-hash-table :test #'equal))
 (defparameter *relations* (make-hash-table :test #'equal))
@@ -62,7 +66,7 @@
 
 (defun read-wn ()
   (init-hash-tables)
-  (let ((docs (gethash "docs" (gethash "response" (yason:parse #p"wn.json")))))
+  (let ((docs (gethash "docs" (gethash "response" (yason:parse (merge-pathnames "wn.json" *basedir*))))))
     (dolist (d docs)
       (let ((synset (gethash "doc_id" d)))
 	(dolist (property-name *properties*)
@@ -100,4 +104,13 @@
 (defun debug-hierarchy (tree &optional (indent 0))
   (dolist (r tree)
     (format t "~a[~a] ~a~%" (make-string indent :initial-element #\space) indent (cdr (assoc :word r)))
-    (print-hierarchy (cdr (assoc :children r)) (+ 2 indent))))
+    (debug-hierarchy (cdr (assoc :children r)) (+ 2 indent))))
+
+(defun debug-hierarchy2 (tree &optional (indent 0))
+  (with-output-to-string (str)
+    (debug-hierarchy3 tree str indent)))
+
+(defun debug-hierarchy3 (tree stream &optional (indent 0))
+  (dolist (r tree)
+    (format stream "~a[~a] ~a~%" (make-string indent :initial-element #\space) indent (cdr (assoc :word r)))
+    (debug-hierarchy3 (cdr (assoc :children r)) stream (+ 2 indent))))
