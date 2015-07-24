@@ -3,8 +3,8 @@
 (in-package #:wordnet-graph)
 
 (defparameter test-data
-    '("02604760-v" "01158872-v" "00056930-v" "00024073-r" "14974264-n" "06468951-n"
- "00047534-r" "11410625-n" "05660268-n" "08462320-n" "14845743-n" "00014285-r"
+    '("15124361-n" "02604760-v" "01158872-v" "00056930-v" "00024073-r" "14974264-n" "06468951-n"
+;; "00047534-r" "11410625-n" "05660268-n" "08462320-n" "14845743-n" "00014285-r"
  "14877585-n" "05996646-n" "01210854-a" "11495041-n" "04007894-n" "14966667-n"))
 
 (defparameter *relations* (make-hash-table :test #'equal))
@@ -60,23 +60,31 @@
   (let ((closure synsets)
 	(tmp nil))
     (loop 
-       (setf tmp (remove-duplicates (append closure (mapcan #'relation-up closure)) :test #'equal))
+       (setf tmp (remove-duplicates 
+		  (append closure (mapcan #'relation-up closure)) 
+		  :test #'equal))
        (when (= (length tmp) (length closure))
 	 (return))
        (setf closure tmp))
     (remove-duplicates closure :test #'equal)))
 
 (defun roots (synsets)
-  (let ((r nil))
-    (dolist (s synsets)
-      (when (zerop (funcall *out-degree-fn* s))
-	(push s r)))
-    r))
+  (remove-if-not (lambda (s) 
+		   (zerop (funcall *out-degree-fn* s))) 
+		 synsets))
 
 (defun get-subtree-node (n closure)
   (when (find n closure :test #'equal)
-      (list (word n) (mapcan (lambda (n) (remove nil (get-subtree-node n closure))) (relation-down n)))))
+    (acons 
+     :word (word n)
+     (acons 
+      :synset n
+      (acons 
+       :children
+       (remove nil (mapcar (lambda (n) (get-subtree-node n closure)) 
+		    (relation-down n)))
+       nil)))))
 
 (defun create-hierarchy (synsets)
   (let* ((s* (transitive-closure synsets)))
-    (mapcan (lambda (n) (get-subtree-node n s*)) (roots s*))))
+    (mapcar (lambda (n) (get-subtree-node n s*)) (roots s*))))
