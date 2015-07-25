@@ -97,6 +97,9 @@
 		    (inverse-relation n)))
        nil)))))
 
+(defun hyponym-instance-closure (synsets)
+  (transitive-closure synsets #'relation))
+
 (defun create-hierarchy (synsets)
   (let* ((s* (transitive-closure synsets #'relation)))
     (mapcar (lambda (n) (get-subtree-node n s*)) (roots s*))))
