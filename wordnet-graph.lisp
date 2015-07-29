@@ -175,10 +175,10 @@
 
 ;; wn.json *hyp-inst-properties*
 (defun read-hyp-inst-wn ()
-  (read-wn #p"wn.json" *hyp-inst-properties*))
+  (read-wn #p"wn-hi.json" *hyp-inst-properties*))
 
 (defun read-all-wn ()
-  (read-wn #p"wn-full.json" *all-properties*))
+  (read-wn #p"wn.json" *all-properties*))
 
 (defun roots (synsets)
   (remove-if-not (lambda (s) 

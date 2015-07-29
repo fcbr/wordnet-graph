@@ -3,7 +3,7 @@ International License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by/4.0/.
 
 The work uses the Princeton WordNet 3.0 distributed partially here in
-JSON format in the file wn.json. The Princeton WordNet 3.0 is
+JSON format in the files wn*.json. The Princeton WordNet 3.0 is
 distributed under the license
 http://wordnet.princeton.edu/wordnet/license/.
 
