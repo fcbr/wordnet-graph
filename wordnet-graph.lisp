@@ -180,6 +180,9 @@
 (defun read-all-wn ()
   (read-wn #p"wn.json" *all-properties*))
 
+(defun read-hypernym-wn ()
+  (read-wn #p"wn.json" '("wn30_hypernymOf")))
+
 (defun roots (synsets)
   (remove-if-not (lambda (s) 
 		   (zerop (funcall *out-degree-fn* s))) 
