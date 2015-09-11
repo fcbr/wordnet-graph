@@ -203,7 +203,7 @@ deal with cycles yet."
                            (reverse-edges n)))
        nil)))))
 
-(defun transitive-closure (synsets)
+(defun wn-transitive-closure (synsets)
   (transitive-closure synsets #'edges))
 
 (defun create-hierarchy (synsets)
